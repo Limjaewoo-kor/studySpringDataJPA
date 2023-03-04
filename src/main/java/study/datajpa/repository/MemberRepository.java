@@ -13,7 +13,7 @@ import javax.persistence.QueryHint;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member,Long> {
+public interface MemberRepository extends JpaRepository<Member,Long>, MemberRepositoryCustom , JpaSpecificationExecutor<Member>{
 
     //방법 1 이름으로 쿼리 만들기 [실무에서는 간단 간단한 쿼리를 짤때 사용]
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
@@ -89,5 +89,29 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
     //select 쿼리를 돌릴때 lock 을 잡기위해 for update 를 붙인다
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Member> findLockByUsername(String name);
+
+
+
+    //Projections
+//    엔티티 대신에 DTO를 편리하게 조회할 때 사용 -- UsernameOnly 인터페이스만 생성하였다. 구현체 X
+//    전체 엔티티가 아니라 만약 회원 이름만 딱 조회하고 싶으면?
+
+    List<UsernameOnly> findProjectionsByUsername(@Param("username") String username);
+
+
+    List<UsernameOnlyDto> findProjectionsDtoByUsername(@Param("username") String username);
+
+
+    //nativeQuery
+
+    @Query(value = "select * from member where username = ?", nativeQuery = true)
+    Member findByNativeQuery(String username);
+
+
+    @Query(value = "SELECT m.member_id as id, m.username, t.name as teamName " +
+            "FROM member m left join team t ON m.team_id = t.team_id",
+            countQuery = "SELECT count(*) from member",
+            nativeQuery = true)
+    Page<MemberProjection> findByNativeProjection(Pageable pageable);
 
 }

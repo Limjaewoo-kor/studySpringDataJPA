@@ -1,18 +1,27 @@
 
 spring:
   datasource:
-  #
-  url: jdbc:h2:tcp://localhost/~/datajpa
+  url: jdbc:h2:tcp://localhost/~/datajpa;
   username: sa
   password:
   driver-class-name: org.h2.Driver
-jpa:
-  hibernate:
-    ddl-auto: create
-  properties:
+
+  jpa:
     hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
 #      show_sql: true
       format_sql: true
+  data:
+    web:
+      pageable:
+        default-page-size: 10  # 기본 페이지 사이즈
+        max-page-size: 2000  # 최대 페이지 사이즈
+#        one-indexed-parameters: true
+#        spring.data.web.pageable.one-indexed-parameters 를 true 로 설정한다.
+#        그런데 이 방법은 web에서 page 파라미터를 -1 처리 할 뿐이다. 따라서 응답값인 Page 에 모두 0 페이지 인덱스를 사용하는 한계가 있다. pageNumber 등이 맞지 않다
+
     logging.level:
       org.hibernate.SQL: debug
     #  org.hibernate.type: trace
